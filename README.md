@@ -50,6 +50,39 @@ flowchart TD
 
 ---
 
+## 内蔵サブエージェント一覧（全17種）
+
+各親スキルは、専門タスクに特化した自律サブエージェントをディスパッチして分業を推進します。
+
+### 1. game-spec-architect（企画・要件定義）
+- **`spec-interviewer`**: ユーザーと段階的対話を行い、ゲームの次元・コアループ・勝利条件をヒアリング。
+- **`spec-task-decomposer`**: 確定した仕様からMVPスコープのTODOタスクリストを作成。
+- **`spec-asset-analyzer`**: 必要なスプライト、3Dモデル、BGM、SE、UI素材を洗い出し。
+
+### 2. game-art-director（アートディレクション）
+- **`palette-typo-specialist`**: 60-30-10比率によるカラーパレット（HEX）およびタイポグラフィ規格策定。
+- **`ui-style-specialist`**: 絵文字を完全排除したベクター/テクスチャHUD、ライフバー、ダイアログ設計。
+- **`vfx-shader-specialist`**: パーティクル（煙・火花・光芒）およびマテリアル質感（ラフネス・メタリック）の統一。
+
+### 3. godot-2d-specialist（Godot 2D実装）
+- **`2d-logic-specialist`**: `CharacterBody2D` の物理挙動、ステートマシン、入力系実装。
+- **`2d-level-specialist`**: `TileMapLayer`、足場・障害物配置、`Camera2D` スムージング制御。
+- **`2d-ui-specialist`**: アート規約に準拠したベクターHUD、ライフバー、ポーズ画面実装。
+- **`2d-vfx-audio-specialist`**: `CPUParticles2D`（土煙、光芒）およびオーディオプール管理。
+
+### 4. godot-3d-specialist（Godot 3D実装）
+- **`3d-logic-specialist`**: `CharacterBody3D`、三人称追従カメラ（`SpringArm3D` + `Camera3D`）、3Dステートマシン。
+- **`3d-level-specialist`**: `.blend` モデル（`-col` 自動コリジョン）の配置、ライティング（影設定）。
+- **`3d-ui-specialist`**: 3D空間と調和するモダンなCanvasLayer HUD、リザルト画面。
+- **`3d-vfx-audio-specialist`**: `GPUParticles3D`（衝撃波・煙・火花）および3D位置音響制御。
+
+### 5. blender-asset-creator（Blender 3D制作）
+- **`blender-mesh-specialist`**: Python（`bpy`）によるメッシュ自動生成、原点接地、スケール適用。
+- **`blender-mat-specialist`**: カラーパレットに基づくPrincipled BSDFマテリアル設定。
+- **`blender-rig-anim-specialist`**: 回転・浮遊・開閉アニメーションおよびボーンリグ構築。
+
+---
+
 ## 導入方法
 
 Antigravity のスキルディレクトリ（通常は `~/.gemini/config/skills/`）に対象のスキルフォルダを配置することで利用可能になります。
