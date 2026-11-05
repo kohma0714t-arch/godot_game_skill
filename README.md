@@ -2,11 +2,11 @@
 
 Godot 4.x および Blender 5.2 を活用したゲーム開発を自律的かつ体系的に推進するための Antigravity 専用スキルスイートです。
 
-ストーリー・世界観の共創、物語起点のアセット網羅的洗い出し、ゲーム仕様策定（GDD）、アートディレクション、2D/3Dエンジン実装、3Dアセット自動生成まで、各工程に特化したスキル群が有機的に連携して高品質なゲーム制作を支援します。
+ストーリー・世界観の共創、物語起点のアセット網羅的洗い出し、ゲーム仕様策定（GDD）、アートディレクション、2Dゲーム向け素材抽出・自律品質検証・ステージ自動構築・4方向アクションアニメーション生成、そしてGodot 2D/3Dエンジン実装まで、各工程に特化したスキル群が有機的に連携して高品質なゲーム制作を一気通貫で支援します。
 
 ---
 
-## 収録スキル一覧
+## 収録スキル一覧（全10スキル）
 
 | スキル名 | ディレクトリ | 役割・概要 |
 | :--- | :--- | :--- |
@@ -14,13 +14,16 @@ Godot 4.x および Blender 5.2 を活用したゲーム開発を自律的かつ
 | **story-asset-extractor** | `story-asset-extractor/` | 確定したストーリーから制作に必要な全素材（キャラ、背景、アイテム、サウンド、UI）を洗い出し、2D/3D対応アセットマトリクスを作成するスキル。 |
 | **game-spec-architect** | `game-spec-architect/` | ゲーム企画の壁打ち・要件定義からMVP仕様書（GDD）策定、タスク分解までをヒアリング主導で推進する親オーケストレータースキル。 |
 | **game-art-director** | `game-art-director/` | ゲーム全体のビジュアル調和、カラーパレット、UI/HUDデザイン、質感を統括し、AI特有の安易な絵文字多用やチープなデザインを排除・監修するアートディレクションスキル。 |
-| **godot-2d-specialist** | `godot-2d-specialist/` | Godot 4.xでの2Dゲーム（プラットフォーマー、トップダウン等）開発オーケストレーター。CharacterBody2D物理、ステートマシン、TileMapLayer、VFX、オーディオ管理を統括。 |
+| **game-2d-asset-crafter** | `game-2d-asset-crafter/` | デザインイメージからキャラクター、タイル、アイテム、UI素材を透過切り出し・AI補完生成し、二段階品質検証（パレット・透過境界・規格）で合格まで自律リトライする2D素材制作スキル。 |
+| **topdown-2d-map-architect** | `topdown-2d-map-architect/` | 抽出タイル素材からハイブリッド型（設計＋自動接続）でステージを構築し、構成の崩れ（BFS経路探索100%保証）およびデザインの崩れ（タイル接続・壁内埋没）を自動検証してGodot TileMapLayerを出力するスキル。 |
+| **character-2d-animator** | `character-2d-animator/` | 基準スプライトから4方向（正面/背面/左右）フルアクションアニメーション（待機・歩行・ダッシュ・弱攻撃・強攻撃・被弾・死亡）を展開し、重心ジッター検査・ループGIF生成・Godot SpriteFramesを出力するスキル。 |
+| **godot-2d-specialist** | `godot-2d-specialist/` | Godot 4.xでの2Dゲーム開発オーケストレーター。上記2D制作スキル群の成果物（TileMapLayer, SpriteFrames）を統合し、物理、ステートマシン、カメラ、UI、オーディオ、およびCLI自動検証を統括。 |
 | **godot-3d-specialist** | `godot-3d-specialist/` | Godot 4.xでの3Dゲーム（3Dアクション、TPS等）開発オーケストレーター。CharacterBody3D、三人称追従カメラ、3D物理、Blender統合、3D VFX・音響を統括。 |
 | **blender-asset-creator** | `blender-asset-creator/` | Blender 5.2を活用し、Pythonスクリプトによるヘッドレス3D自動モデリング・マテリアル・アニメーション・Godot用自動コリジョン生成を行うアセットオーケストレータースキル。 |
 
 ---
 
-## 連携ワークフロー
+## 全体連携アーキテクチャ & 依存関係
 
 ```mermaid
 flowchart TD
@@ -28,78 +31,78 @@ flowchart TD
     SAExt["story-asset-extractor\n(素材網羅的洗い出し)"]
     GSA["game-spec-architect\n(企画・GDD策定・全体統括)"]
     GAD["game-art-director\n(アート統括・カラーパレット・UIデザイン)"]
-    G2D["godot-2d-specialist\n(Godot 2D実装・物理・TileMap・オーディオ)"]
-    G3D["godot-3d-specialist\n(Godot 3D実装・TPSカメラ・物理)"]
-    BAC["blender-asset-creator\n(Blender 3D自動生成・コリジョン・リグ)"]
+
+    subgraph Pipeline2D ["2Dゲーム制作自律パイプライン (ステップ承認型)"]
+        G2D_Craft["game-2d-asset-crafter\n(素材切り出し・差分生成・二段階品質検証)"]
+        G2D_Map["topdown-2d-map-architect\n(ハイブリッド型ステージ設計・BFS経路テスト)"]
+        G2D_Anim["character-2d-animator\n(4方向フルアクション展開・重心ジッター検査)"]
+        G2D["godot-2d-specialist\n(シーン統合・物理・カメラ・HUD・CLI検証)"]
+    end
+
+    subgraph Pipeline3D ["3Dゲーム制作パイプライン"]
+        BAC["blender-asset-creator\n(Blender 3D自動生成・コリジョン・リグ)"]
+        G3D["godot-3d-specialist\n(Godot 3D実装・TPSカメラ・物理)"]
+    end
 
     GStory -->|ストーリー仕様書 story.md| SAExt
     SAExt -->|アセット計画書 assets_plan.md| GSA
     GSA -->|アート規約・UI監修| GAD
-    GSA -->|2D判定時| G2D
-    GSA -->|3D判定時| G3D
+    
+    GAD -->|カラーパレット・アウトライン規約| G2D_Craft
+    G2D_Craft -->|タイル・背景・プロップ素材| G2D_Map
+    G2D_Craft -->|キャラクター基準スプライト| G2D_Anim
+    G2D_Map -->|ステージシーン stage_*.tscn| G2D
+    G2D_Anim -->|SpriteFrames player_frames.tres| G2D
+
+    GAD -->|3Dマテリアル・シェーダー方針| BAC
     SAExt -.->|3D素材要件| BAC
-    BAC -->|モデル・アニメーション出力| G3D
-    GAD -->|ビジュアル統一・UI素材規格| G2D
-    GAD -->|ビジュアル統一・UI素材規格| G3D
+    BAC -->|モデル・アニメーション出力 .blend| G3D
+    GSA -->|3D判定時| G3D
 ```
-
-### 開発フロー詳細
-
-1. **ストーリー共創フェーズ (`game-story-architect`)**:
-   - ユーザーへの段階的ヒアリング（世界観・キャラクター・起承転結プロット）を行い、`story.md` を策定します。
-2. **アセット洗い出しフェーズ (`story-asset-extractor`)**:
-   - ストーリーを解析し、キャラクター、背景、プロップ、BGM/SE、UI演出の全アセットを抽出して `assets_plan.md` を生成します。
-3. **ゲーム仕様策定フェーズ (`game-spec-architect`)**:
-   - コアループ、ゲームプレイ、勝利/敗北条件を明確化し、MVP仕様書（GDD）とタスクリストを策定します。
-4. **アートディレクションフェーズ (`game-art-director`)**:
-   - ビジュアルトーン、カラーパレット（60-30-10原則）、フォント規約、HUDレイアウト基準を確定し、絵文字を排除したUIを構築します。
-5. **アセット生成フェーズ (`blender-asset-creator`)**:
-   - 3Dゲームの場合、Blender Pythonを活用してローポリ3Dモデル、マテリアル、リグ、アニメーション、およびGodot用コリジョン（`-col`）を自動生成します。
-6. **エンジン実装フェーズ (`godot-2d-specialist` / `godot-3d-specialist`)**:
-   - Godot 4.x のノード構造、型付けされたGDScript、ステートマシン、物理挙動、オーディオ・VFX、CLI自動検証（ヘッドレス構文チェック）を実装・統括します。
 
 ---
 
-## 内蔵サブエージェント一覧（全23種）
+## 2Dゲーム制作統合パイプラインの各スキル詳細
 
-各親スキルは、専門タスクに特化した自律サブエージェントをディスパッチして分業を推進します。
+### 1. game-2d-asset-crafter (素材制作・自律反復検証)
+- **概要**: 提示されたデザインイメージ（一枚絵等）からパーツを切り出し、背景透過処理や不足素材の補完生成を行い、元デザインとの整合性をテストしてスプライトシート化します。
+- **付属スクリプト**:
+  - `scripts/extract_segments.py`: バウンディングボックスクロップ、四隅自動色推定による背景透過、オートクロップ、等倍グリッド配置（Nearest Neighborリサイズ）。
+  - `scripts/validate_sprite_quality.py`: パレット類似度（閾値60%以上）、アルファ透過フリンジ/半透明ピクセル率（5%未満）、グリッド規格を自動検証（JSONレポート出力）。
+  - `scripts/pack_spritesheet.py`: 個別透過PNGを等幅グリッドスプライトシートに結合し、Godot/Phaser向けメタデータJSONを出力。
+- **後続連携**:
+  - タイル素材を `topdown-2d-map-architect` へ引き渡し。
+  - キャラクター基準素材を `character-2d-animator` へ引き渡し。
 
-### 1. game-story-architect（ストーリー共創）
-- **`story-world-builder`**: 世界観・時代背景・魔法/科学法則・地理・対立構造の構築。
-- **`story-character-profiler`**: 主人公・敵ボス・NPCの性格、動機、口調、ビジュアル特徴定義。
-- **`story-plot-pacing`**: 各ステージのゲームプレイと連動した起承転結プロットの設計。
+### 2. topdown-2d-map-architect (ステージ設計・自律検証)
+- **概要**: 抽出されたタイルから、ユーザーのイメージの有無に応じたハイブリッド型（主要地点固定＋通路自動接続）でステージを設計し、二大自動テストに合格するまで自律修正します。
+- **二大自動テスト**:
+  - **構成の崩れテスト (`scripts/validate_map_structure.py`)**: BFS（幅優先探索）により、スタート地点からゴール（Exit）および全宝箱への移動経路が100%確保されているかを検証。外周の密閉壁漏れ、孤立床を排除。
+  - **デザインの崩れテスト (`scripts/validate_map_design.py`)**: 孤立した1マス壁、壁で囲まれた1マス床穴、壁内部への小道具（松明等）の誤埋没を検出。
+- **付属スクリプト**:
+  - `scripts/build_topdown_map.py`: ハイブリッド型マップ構築、全体俯瞰プレビューPNGレンダリング、Godot 4.x TSCNエクスポート。
+- **後続連携**:
+  - 生成されたステージシーン（`stage_*.tscn`）を `godot-2d-specialist` のレベル担当へ引き渡し。
 
-### 2. story-asset-extractor（素材洗い出し）
-- **`asset-visual-extractor`**: 物語からキャラクター、背景、プロップのビジュアル仕様を抽出。
-- **`asset-audio-extractor`**: シーンの感情トーンやテンポに応じたBGM・効果音・環境音仕様を抽出。
-- **`asset-matrix-formatter`**: 2D/3D両対応のアセット計画マトリクス（優先度・担当スキル連動）を整形。
+### 3. character-2d-animator (4方向アニメーション展開・自律検証)
+- **概要**: 抽出された基準キャラから、4方向（正面/背面/左右）に対応したフルアクション（待機・歩行・ダッシュ・弱攻撃・強攻撃・被弾・死亡）のコマ展開を行い、フレーム間のブレを自動検証してGodotリソースを出力します。
+- **フルアクション7大ステート**:
+  - `Idle`: 2〜4コマ、穏やかな呼吸による上下動（ループ）
+  - `Walk`: 4〜6コマ、腕振り・足踏み・接地感の維持（ループ）
+  - `Dash`: 2〜4コマ、前傾姿勢と推進力（ループ）
+  - `Light Attack`: 3〜4コマ、短い予備動作と鋭い素振り（ワンショット）
+  - `Heavy Attack`: 5〜6コマ、溜めと力強い振り下ろし（ワンショット）
+  - `Hurt`: 2〜3コマ、のけぞり・ノックバック（ワンショット）
+  - `Death`: 4〜6コマ、倒れ込み・消滅演出（停止）
+- **付属スクリプト**:
+  - `scripts/validate_animation.py`: フレーム間の重心ジッター（3.5px以内）、シルエット体積ブレ（±25%以内）、ループ接続跳躍の自動検査。
+  - `scripts/render_anim_preview.py`: 3倍Nearest拡大を適用した透過ループプレビューGIFおよび横並びフィルムストリップ画像生成。
+  - `scripts/export_godot_spriteframes.py`: Godot 4.x の `SpriteFrames` リソース（`.tres`）を自動エクスポート。
+- **後続連携**:
+  - 生成された `player_frames.tres` を `godot-2d-specialist` のロジック担当へ引き渡し。
 
-### 3. game-spec-architect（企画・要件定義）
-- **`spec-interviewer`**: ユーザーと段階的対話を行い、ゲームの次元・コアループ・勝利条件をヒアリング。
-- **`spec-task-decomposer`**: 確定した仕様からMVPスコープのTODOタスクリストを作成。
-- **`spec-asset-analyzer`**: 必要なスプライト、3Dモデル、BGM、SE、UI素材を洗い出し。
-
-### 4. game-art-director（アートディレクション）
-- **`palette-typo-specialist`**: 60-30-10比率によるカラーパレット（HEX）およびタイポグラフィ規格策定。
-- **`ui-style-specialist`**: 絵文字を完全排除したベクター/テクスチャHUD、ライフバー、ダイアログ設計。
-- **`vfx-shader-specialist`**: パーティクル（煙・火花・光芒）およびマテリアル質感（ラフネス・メタリック）の統一。
-
-### 5. godot-2d-specialist（Godot 2D実装）
-- **`2d-logic-specialist`**: `CharacterBody2D` の物理挙動、ステートマシン、入力系実装。
-- **`2d-level-specialist`**: `TileMapLayer`、足場・障害物配置、`Camera2D` スムージング制御。
-- **`2d-ui-specialist`**: アート規約に準拠したベクターHUD、ライフバー、ポーズ画面実装。
-- **`2d-vfx-audio-specialist`**: `CPUParticles2D`（土煙、光芒）およびオーディオプール管理。
-
-### 6. godot-3d-specialist（Godot 3D実装）
-- **`3d-logic-specialist`**: `CharacterBody3D`、三人称追従カメラ（`SpringArm3D` + `Camera3D`）、3Dステートマシン。
-- **`3d-level-specialist`**: `.blend` モデル（`-col` 自動コリジョン）の配置、ライティング（影設定）。
-- **`3d-ui-specialist`**: 3D空間と調和するモダンなCanvasLayer HUD、リザルト画面。
-- **`3d-vfx-audio-specialist`**: `GPUParticles3D`（衝撃波・煙・火花）および3D位置音響制御。
-
-### 7. blender-asset-creator（Blender 3D制作）
-- **`blender-mesh-specialist`**: Python（`bpy`）によるメッシュ自動生成、原点接地、スケール適用。
-- **`blender-mat-specialist`**: カラーパレットに基づくPrincipled BSDFマテリアル設定。
-- **`blender-rig-anim-specialist`**: 回転・浮遊・開閉アニメーションおよびボーンリグ構築。
+### 4. godot-2d-specialist (ゲームシーン統合・CLI自律検証)
+- **概要**: 上記スキル群からステージ（`stage_*.tscn`）とキャラクターアニメーション（`SpriteFrames`）を集約し、`CharacterBody2D` に4方向ステートマシンを実装。カメラ追従、HUD、VFXを組み込み、Godot CLI自動検証を経てプレイ可能なゲームとして完成させます。
 
 ---
 
@@ -108,11 +111,14 @@ flowchart TD
 Antigravity のスキルディレクトリ（通常は `~/.gemini/config/skills/`）に対象のスキルフォルダを配置することで利用可能になります。
 
 ```bash
-# 例: スキルディレクトリへの配置
+# スキルディレクトリへの配置例
 cp -r game-story-architect ~/.gemini/config/skills/
 cp -r story-asset-extractor ~/.gemini/config/skills/
 cp -r game-spec-architect ~/.gemini/config/skills/
 cp -r game-art-director ~/.gemini/config/skills/
+cp -r game-2d-asset-crafter ~/.gemini/config/skills/
+cp -r topdown-2d-map-architect ~/.gemini/config/skills/
+cp -r character-2d-animator ~/.gemini/config/skills/
 cp -r godot-2d-specialist ~/.gemini/config/skills/
 cp -r godot-3d-specialist ~/.gemini/config/skills/
 cp -r blender-asset-creator ~/.gemini/config/skills/
